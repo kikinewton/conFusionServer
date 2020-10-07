@@ -12,6 +12,7 @@ const usersRouter = require("./routes/users");
 const dishRouter = require("./routes/dishRouter");
 const leaderRouter = require("./routes/leaderRouter");
 const promoRouter = require("./routes/promoRouter");
+const uploadRouter = require("./routes/uploadRouter");
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 var app = express();
@@ -36,12 +37,23 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 
+//secure traffic only
+app.all('*', (req, res, next) => {
+  if(req.secure){
+    return next();
+  }
+  else {
+    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+  }
+})
+
 app.use("/", indexRouter);
 // console.log("before /users");
 app.use("/users", usersRouter);
 app.use("/dishes", dishRouter);
 app.use("/promos", promoRouter);
 app.use("/leaders", leaderRouter);
+app.use('/uploadImage', uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

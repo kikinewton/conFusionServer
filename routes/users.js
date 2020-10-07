@@ -5,9 +5,10 @@ const User = require("../models/users");
 // router.use(bodyParser.json());
 const authenticate = require("../authenticate");
 const passport = require("passport");
+const cors = require("./cors");
 
 /*Register a user. */
-userRouter.route("/signup").post((req, res, next) => {
+userRouter.route("/signup").post(cors.corsWithOptions, (req, res, next) => {
   console.log("body" + JSON.stringify(req.body));
   User.register(
     new User({ username: req.body.username }),
@@ -38,14 +39,14 @@ userRouter.route("/signup").post((req, res, next) => {
   );
 });
 
-userRouter.post("/login", passport.authenticate("local"), (req, res) => {
+userRouter.post("/login", cors.corsWithOptions, passport.authenticate("local"), (req, res) => {
   const jwtToken = authenticate.getToken({ _id: req.user._id });
   res.statusCode = 200;
   res.setHeader("Content-Type", "application/json");
   res.json({ success: true, token: jwtToken, status: "Login successful" });
 });
 
-userRouter.route("/").get(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
+userRouter.route("/").get(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   User.find()
     .then((users) => {
       res.statusCode = 200;
