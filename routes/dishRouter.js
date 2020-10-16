@@ -205,6 +205,7 @@ dishRouter
       .then(
         (dish) => {
           if (dish != null) {
+            console.log('comment: ' + dish.comments)
             dish.comments.forEach((element) => {
               element.remove();
             });
